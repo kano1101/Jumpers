@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+# kano1101
+.DS_Store
