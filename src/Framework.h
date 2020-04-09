@@ -17,7 +17,13 @@ using AllTList = Loki::TL::MakeTypelist<MainActor>::Result;
 constexpr std::size_t InstanceMax = 256;
 using Base = Mix::BaseAllocatable<Mix::Actor, AllTList, InstanceMax>;
 
-class MainActor : public GameObject<Base, Image<ETex, mariwo>, Mix::Vector2D, NormalGravity> {};
+class MainActor : public GameObject<Base, Image<ETex, mariwo>, Mix::Vector2D, NormalGravity> {
+protected:
+  using BaseType = Base;
+public:
+  MainActor(double x) : GameObject<Base, Image<ETex, mariwo>, Mix::Vector2D, NormalGravity>(x) {}
+  virtual void Test();
+};
 
 template<class T>
 using Allocator = Mix::CyclicAllocator<T>;
@@ -46,7 +52,9 @@ class Framework
     currentTime_ = lastTime_ = elapsedTime_ = 0.0; // <---
     glfwSetTime(0.0); // <--- タイマーを初期化する
 
-    Creator<MainActor>::Create();
+    Creator<MainActor>::Create(400.0f);
+    // Creator<MainActor>::Create(200);
+    // Creator<MainActor>::Create(300);
     
   }
   bool Execute()

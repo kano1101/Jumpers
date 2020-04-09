@@ -20,8 +20,8 @@ class GameObject
   Velocity vel_;
   
 public:
-  explicit GameObject()
-    : pos_(100.0f, 200.0f), vel_()
+  explicit GameObject(double x)
+    : pos_(x, 200.0f), vel_(), count_(0)
   {
     
   }
@@ -51,7 +51,20 @@ public:
       if (vel_.Y() > 0) // TODO:Y方向へはvel_.Y()のによってはブロックを叩く
         ; // TODO:叩いたらアクション（ポリシーに実装）
     }
+
+    // 実証試験
+    if (static_cast<int>(pos_.Y()) % 200 == 0)
+    {
+      Test();
+    }
+      
   }
+
+protected:
+  int count_;
+
+public:
+  virtual void Test() = 0;
   
 };
 
