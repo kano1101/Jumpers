@@ -1,6 +1,7 @@
 #ifndef _GAME_OBJECT_H_
 #define _GAME_OBJECT_H_
 
+#include <stdio.h>
 #include <loki/Singleton.h>
 #include <mix/Vector.h> // 移動ポリシーへ改善の余地がある(この行消せる)
 
@@ -13,6 +14,7 @@ template<
 class GameObject
   : public BaseType
 {
+protected:
   using Position = VectorType;
   using Velocity = VectorType;
   
@@ -21,7 +23,7 @@ class GameObject
   
 public:
   explicit GameObject(double x)
-    : pos_(x, 200.0f), vel_(), count_(0)
+    : pos_(x, 50.0f), vel_(), count_(0)
   {
     
   }
@@ -55,6 +57,7 @@ public:
     // 実証試験
     if (static_cast<int>(pos_.Y()) % 200 == 0)
     {
+      fprintf(stderr, "test");
       Test();
     }
       

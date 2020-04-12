@@ -7,7 +7,7 @@
 #include <loki/Typelist.h>
 #include <mix/Actor.h>
 #include <mix/Vector.h>
-#include <mix/CyclicAllocator.h>
+#include <mix/Allocator.h>
 #include <mix/UsingAllocatorCreator.h>
 #include "GameObject.h"
 #include "Image.h"
@@ -21,12 +21,12 @@ class MainActor : public GameObject<Base, Image<ETex, mariwo>, Mix::Vector2D, No
 protected:
   using BaseType = Base;
 public:
-  MainActor(double x) : GameObject<Base, Image<ETex, mariwo>, Mix::Vector2D, NormalGravity>(x) {}
+  MainActor(double x = 20.0f) : GameObject<Base, Image<ETex, mariwo>, Mix::Vector2D, NormalGravity>(x) {}
   virtual void Test();
 };
 
 template<class T>
-using Allocator = Mix::CyclicAllocator<T>;
+using Allocator = Mix::EraseSafeAllocator<T>;
 template<class T>
 using Creator = Mix::CreateUsing<Allocator>::Creator<T>;
 
@@ -53,8 +53,8 @@ class Framework
     glfwSetTime(0.0); // <--- タイマーを初期化する
 
     Creator<MainActor>::Create(400.0f);
-    // Creator<MainActor>::Create(200);
-    // Creator<MainActor>::Create(300);
+    Creator<MainActor>::Create(200);
+    Creator<MainActor>::Create(300);
     
   }
   bool Execute()
@@ -84,8 +84,18 @@ class Framework
   void Update()
   {
     Allocator<Base>::ForAll(
-      [] (auto& e) { static_cast<Base*>(&e)->Update(); }
+      [] (auto& e) {
+        Base* p = static_cast<Base*>(&(e.second));
+        p->Update();
+      }
+      // [] (auto& e) { static_cast<Mix::Actor*>(e.second)->Update(); }
+      // [] (auto& e) { Allocator<Base>::Convert(Allocator<Base>::Iterator(&(e.second)))->Update();}
     );
+    static int i = 0;
+    if ( ++i % 100 == 0 ) {
+      // Creator<Base>::Destroy
+      Creator<MainActor>::Create(50.0f);
+    }
   }
   void Draw()
   {
@@ -98,7 +108,12 @@ class Framework
 
     // 描画処理
     Allocator<Base>::ForAll(
-      [] (auto& e) { static_cast<Base*>(&e)->Draw(); }
+      [] (auto& e) {
+        Base* p = static_cast<Base*>(&(e.second));
+        p->Draw();
+      }
+      // [] (auto& e) { static_cast<Mix::Actor*>(e.second)->Draw(); }
+      // [] (auto& e) { Allocator<Base>::Convert(Allocator<Base>::Iterator(&(e.second)))->Draw();}
     );
       
     // 描画用バッファの切り替え
