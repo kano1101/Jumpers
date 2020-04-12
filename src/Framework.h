@@ -87,15 +87,22 @@ class Framework
       [] (auto& e) {
         Base* p = static_cast<Base*>(&(e.second));
         p->Update();
+        static int j = 0;
+        if ( ++j % 200 == 0 )
+        {
+          MainActor* testing = dynamic_cast<MainActor*>(p);
+          // fprintf(stderr, "%p %p\n", p, testing);
+          Creator<MainActor>::Destroy(testing);
+        }
       }
       // [] (auto& e) { static_cast<Mix::Actor*>(e.second)->Update(); }
       // [] (auto& e) { Allocator<Base>::Convert(Allocator<Base>::Iterator(&(e.second)))->Update();}
     );
-    static int i = 0;
-    if ( ++i % 100 == 0 ) {
-      // Creator<Base>::Destroy
-      Creator<MainActor>::Create(50.0f);
-    }
+    // static int i = 0;
+    // if ( ++i % 100 == 0 ) {
+    //   // Creator<Base>::Destroy
+    //   Creator<MainActor>::Create(50.0f);
+    // }
   }
   void Draw()
   {

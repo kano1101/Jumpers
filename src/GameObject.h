@@ -57,7 +57,7 @@ public:
     // 実証試験
     if (static_cast<int>(pos_.Y()) % 200 == 0)
     {
-      fprintf(stderr, "test");
+      // fprintf(stderr, "test");
       Test();
     }
       
