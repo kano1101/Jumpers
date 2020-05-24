@@ -33,3 +33,9 @@
 
 # kano1101
 .DS_Store
+GPATH
+GRTAGS
+GTAGS
+Makefileのコピー
+all.h
+all.h.gch

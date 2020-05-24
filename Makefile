@@ -1,7 +1,7 @@
 CC = clang++
 LD = clang++
 CCFLAGS = -Wall -Wextra -c -std=c++14
-LDFLAGS = -lglew -lglfw -lglpng -framework OpenGL
+LDFLAGS = -lglew -lglfw -lglpng -lm -framework OpenGL
 
 SourceDir = src
 BuildDir = build
