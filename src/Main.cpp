@@ -77,6 +77,7 @@ public:
 
     // 縦と横を別に衝突検出するため一時変数へ
     Position temp = pos_ + vel_;
+    (void)temp;
 
     if (!false) // 横判定：壁ブロックに当たっていなければ
       pos_ += vel_.AsX();

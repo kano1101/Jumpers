@@ -1,0 +1,15 @@
+LOAD_FILE_NAME("mariwo.png",   2, 1);
+LOAD_FILE_NAME("kuribe.png",   2, 1);
+LOAD_FILE_NAME("noronoro.png", 2, 1);
+LOAD_FILE_NAME("items.png",    8, 1);
+LOAD_FILE_NAME("object.png",   8, 1);
+
+{ 1, { 0, 1 } } // マリヲ	      
+{ 2, { 0, 1 } } // クリベー
+{ 3, { 0, 1 } } // ノロノロ
+{ 4, { 0 }    } // 1UPきのこ
+{ 4, { 1 }    } // のろのろの甲羅
+{ 5, { 0 }    } // 崩せるブロック
+{ 5, { 1 }    } // 崩せないブロック
+{ 5, { 2 }    } // きのこ隠しブロック
+{ 5, { 3 }    } // コイン
