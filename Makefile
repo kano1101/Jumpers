@@ -18,7 +18,6 @@ MacOSBundleStructure += $(MacOSBundle)/Contents/MacOS
 
 ResourcesDir = resc
 Images = $(wildcard $(ResourcesDir)/imgs/*)
-#Shaders = $(wildcard $(ResourcesDir)/shaders/*)
 
 Sources = $(wildcard src/*.cpp)
 
@@ -38,24 +37,22 @@ $(MacOSBundle): $(UnixExec)
 	cp $(ResourcesDir)/launcher.sh $(MacOSBundle)/Contents/MacOS/
 	chmod +x $(MacOSBundle)/Contents/MacOS/launcher.sh
 	cp $(Images) $(MacOSBundle)/Contents/Resources/
-#	cp $(Shaders) $(MacOSBundle)/Contents/Resources/
-	# Copy dylibs
+# Copy dylibs
 	otool -L $(MacOSBundle)/Contents/MacOS/$(ProductName) |\
 	ggrep -Po '((?<=\t)(?!((\/usr\/lib)|(\/System)))\S+)' |\
 	xargs -n 1 -I {} cp {} $(MacOSBundle)/Contents/Frameworks
-	# Change references
+# Change references
 	otool -L  $(MacOSBundle)/Contents/MacOS/$(ProductName) |\
 	ggrep -Po '((?<=\t)(?!((\/usr\/lib)|(\/System)))\S+)' |\
 	perl -pe 's/(\S*)(?=(lib.+dylib))/\@executable_path\/..\/Frameworks\//; print "$$1$$2 $$3"' |\
 	xargs -J {} -L 1 install_name_tool -change {} $(MacOSBundle)/Contents/MacOS/$(ProductName)
 
 
-$(UnixExec): $(Objects) $(Images) #$(Shaders)
-	#mkdir $(BuildDir)
-	#mkdir -p $(UnixExecDir)
+$(UnixExec): $(Objects) $(Images)
+#	mkdir $(BuildDir)
+#	mkdir -p $(UnixExecDir)
 	$(CC) $(LDFLAGS) $(Objects) -o $(UnixExec)
 	cp $(Images) $(UnixExecDir)
-	#cp $(Shaders) $(UnixExecDir)
 
 $(Objects): $(BuildDir)/%.o: $(SourceDir)/%.cpp 
 	$(CC) $(CCFLAGS) $< -o $@
