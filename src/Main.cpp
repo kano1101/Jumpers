@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 
 #include <mix/FrameworkGL.h>
+#include <mix/GraphicsGL.h>
+#include <mix/InputGL.h>
 #include "Main.h"
 #include "Actor.h"
 #include "GameObject.h"
@@ -37,6 +39,7 @@ int main() {
   // OpenGLの描画対象にWindowを追加
   glfwMakeContextCurrent(window);
 
+  Mix::InputGLSetup(window);
   Mix::GraphicsGL graphics(window, WIN_WIDTH, WIN_HEIGHT);
   Mix::MainWindowGL main(window);
   
