@@ -5,6 +5,9 @@
 
 #include <mix/Director.h>
 
+#include "Gravity.h"
+#include "Power.h"
+
 /////////////////////////////////////////////////////////////////////////
 // 具象アクター(問題領域)定義
 
@@ -19,7 +22,7 @@ using A = GameObject<Loki::Int2Type<0>, NoPower, NormalGravity>;
 using B = GameObject<Loki::Int2Type<1>, NoPower, NormalGravity>;
 using C = GameObject<Loki::Int2Type<2>, NoPower, NormalGravity>;
 using D = GameObject<Loki::Int2Type<3>, NoPower, NormalGravity>;
-using E = GameObject<Loki::Int2Type<4>, NoPower, NormalGravity>;
+using E = GameObject<Loki::Int2Type<4>, ManualInputPower, NoGravity>;
 
 using TList = Loki::TL::MakeTypelist<MapGenerator, A, B, C, D, E>::Result;
 
