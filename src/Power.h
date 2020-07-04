@@ -2,31 +2,35 @@
 
 #include <cassert>
 
+#include <loki/Visitor.h>
+
 #include <mix/InputGL.h>
 #include <mix/Vector.h>
 
-class NoPower {
+#include "Game.h"
+
+using PowerVisitorInterface = Loki::CyclicVisitor<
+  void,
+  Loki::TL::MakeTypelist<Kuribe, Block>::Result
+  >;
+
+class PowerVisitable {
 public:
-  Mix::Vector2D operator()() const noexcept {
-    return Mix::Vector2D(0.0f, 0.0f);
-  }
+  virtual void Accept(PowerVisitorInterface&) = 0;
 };
 
-class ManualInputPower {
+class PowerVisitor
+  : public PowerVisitorInterface {
 public:
-  ManualInputPower() {
-    // int present = glfwJoystickPresent(GLFW_JOYSTICK_1);
-    // assert( present != GLFW_TRUE );
+  template<class Mover> void Move(Mover& e, const Mix::Vector2D& v) {
+    e.ResetVelocity(v);
   }
-  Mix::Vector2D operator()() const noexcept {
-    // int count;
-    // const float* joyAxesX = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
-    // if ( count == 0 ) return Mix::Vector2D(0.0f, 0.0f);
-    // return Mix::Vector2D( joyAxesX[0], 0.0f);
+  virtual void Visit(Kuribe& e) { Move(e, Mix::Vector2D(-0.25f, 0)); }
+  virtual void Visit(Block& e) {
     Mix::Vector2D dir(0.0f, 0.0f);
-    if ( Mix::InputGL::Instance().IsPress('A') ) dir.Move(-0.05f);
-    if ( Mix::InputGL::Instance().IsPress('D') ) dir.Move(+0.05f);
-    return dir;
+    if ( Mix::InputGL::Instance().IsPress('A') ) dir.Move(-0.5f);
+    if ( Mix::InputGL::Instance().IsPress('D') ) dir.Move(+0.5f);
+    Move(e, dir);
   }
 };
 

@@ -1,10 +1,14 @@
 #pragma once
 
 #include <loki/TypeManip.h>
+#include <loki/Singleton.h>
 
 #include <mix/Vector.h>
 #include <mix/Sprite.h>
-#include <mix/Utility.h>
+#include <mix/CollideRect.h>
+#include <mix/Hatch.h>
+//#include <mix/Utility.h>
+
 #include "Actor.h"
 #include "Power.h"
 #include "Gravity.h"
@@ -24,17 +28,28 @@ namespace {
   };
 }
 
+template<class T>
+class ActionTo {
+  T& elem_;
+public:
+  ActionTo(T& elem) : elem_(elem) {}
+  virtual void Reset(const Mix::Vector2D& velocity) { elem_.Reset(velocity); }
+  virtual void Move (const Mix::Vector2D& force)    { elem_.Move (force);    }
+};
+
 /////////////////////////////////////////////////////////////////////////
 // GameObject定義
 template<
-  class Id,
-  class PowerSourcePolicy,
-  class GravityType
+  class Id
   >
 class GameObject
   : public Actor
-  , public Mix::Sprite {
+  , public Mix::Sprite
+  , public Mix::CollideRect<Mix::Vector2D*>
+  , public PowerVisitable
+  , public GravityVisitable {
 private:
+  using VectorType = Mix::Vector2D;
   using Position = Mix::Vector2D;
   using Velocity = Mix::Vector2D;
   
@@ -42,29 +57,44 @@ private:
   Velocity vel_;
 
 public:
+  LOKI_DEFINE_CYCLIC_VISITABLE(PowerVisitorInterface);
+  LOKI_DEFINE_CYCLIC_VISITABLE(GravityVisitorInterface);
+
   GameObject(double x = 100.0, double y = 100.0, unsigned int id = Id::value)
-    : Mix::Sprite(DATA_[id].fpath_, DATA_[id].cx_, DATA_[id].cy_, pos_), pos_(x, y), vel_() {
+    : Mix::Sprite(DATA_[id].fpath_, DATA_[id].cx_, DATA_[id].cy_, pos_)
+    , Mix::CollideRect<Mix::Vector2D*>(&pos_, VectorType{ 0, 0 }, VectorType{ 16, 16 })
+    , pos_(x, y)
+    , vel_() {
   }
-  void AddPowerToVelocity() {
-    // 動力源から速度を加算
-    vel_ += PowerSourcePolicy()();
+  
+  void ResetVelocity(const Mix::Vector2D& velocity) {
+    // 速度をリセット
+    vel_.Reset(velocity.X(), velocity.Y());
   }
-  void AddGravityToVelocity() {
-    // 速度に重力加速度加算
-    vel_ += GravityType()();
+  void AddVelocity(const Mix::Vector2D& force) {
+    // 速度に力を加算
+    vel_.Move(force.X(), force.Y());
   }
-  void ClampLimitToVelocity() {
+
+  void ClampLimitToVelocity(double limit = 5.0f) {
     // 速度が大きくなりすぎないよう最大値リミットをかける
-    const float VELOCITY_MAX_LIMIT = 1.50f;
-    const Mix::Range<float> VELOCITY_RANGE{-VELOCITY_MAX_LIMIT, VELOCITY_MAX_LIMIT};
-    float clampedX = VELOCITY_RANGE.Clamp(vel_.X());
-    float clampedY = VELOCITY_RANGE.Clamp(vel_.Y());
+    const Mix::Range<double> VELOCITY_RANGE{-limit, limit};
+    double clampedX = VELOCITY_RANGE.Clamp(vel_.X());
+    double clampedY = VELOCITY_RANGE.Clamp(vel_.Y());
     vel_.Reset(clampedX, clampedY);
   }
-  virtual void Update() override {
+  // void CollisionBehaivior() {
+  //   Mix::HatchDispatcher d = Mix::MakeHatchDispatcher();
     
-    AddPowerToVelocity();
-    AddGravityToVelocity();
+  // }
+  
+  virtual void Update() override {
+
+    // 積み並べ織り成すVisitorら
+    
+    Accept(Loki::SingletonHolder<PowerVisitor>::Instance());
+    Accept(Loki::SingletonHolder<GravityVisitor>::Instance());
+    
     ClampLimitToVelocity();
 
     // 縦と横を別に衝突検出するため一時変数へ

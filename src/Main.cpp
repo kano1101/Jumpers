@@ -54,7 +54,7 @@ int main() {
     });
 
   Creator<MapGenerator>::Create();
-  Creator<B>::Create(256.0f, 32.0f);
+  Creator<Kuribe>::Create(256.0f, 32.0f);
   framework.Mainloop();
   
   glfwTerminate();
